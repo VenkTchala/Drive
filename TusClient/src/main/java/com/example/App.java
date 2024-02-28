@@ -22,6 +22,7 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
+import java.util.Map;
 
 /**
  * Hello world!
@@ -29,32 +30,32 @@ import java.util.Base64;
  */
 public class App 
 {
-    public static void main( String[] args )
+    public static void main( String[] args ) throws Exception
     {
-//        run();
+        run();
 
-        try {
-
-//            FTPClient ftpClient = ftpClient();
-//            long currentTimeMillis = System.currentTimeMillis();
-
-//            String directoryPath = String.format("/create-directory-test-%d", currentTimeMillis);
-//            String path = String.format("/test-upload-file-%d.jpg", currentTimeMillis);
-//            String newPath = String.format("/test-rename-file-%d.jpg", currentTimeMillis);
+//        try {
 //
-//            ftpClient.makeDirectory("/one");
-//            ftpClient.removeDirectory("drive");
-//            printTree("/", ftpClient);
-//            ftpClient.enterRemotePassiveMode();
-//            uploadFile("/home/siva/code/docker/ftpserver/Dockerfile",  "/drive/Dockerfile", ftpClient);
-//            printTree("/", ftpClient);
-            encrypt();
-        }
-        catch (Exception e){
-            System.out.println(e.getMessage());
-            System.out.println(e.getClass());
-            System.out.println("failed");
-        }
+////            FTPClient ftpClient = ftpClient();
+////            long currentTimeMillis = System.currentTimeMillis();
+//
+////            String directoryPath = String.format("/create-directory-test-%d", currentTimeMillis);
+////            String path = String.format("/test-upload-file-%d.jpg", currentTimeMillis);
+////            String newPath = String.format("/test-rename-file-%d.jpg", currentTimeMillis);
+////
+////            ftpClient.makeDirectory("/one");
+////            ftpClient.removeDirectory("drive");
+////            printTree("/", ftpClient);
+////            ftpClient.enterRemotePassiveMode();
+////            uploadFile("/home/siva/code/docker/ftpserver/Dockerfile",  "/drive/Dockerfile", ftpClient);
+////            printTree("/", ftpClient);
+//            encrypt();
+//        }
+//        catch (Exception e){
+//            System.out.println(e.getMessage());
+//            System.out.println(e.getClass());
+//            System.out.println("failed");
+//        }
     }
 
     private static FTPClient ftpClient() throws IOException {
@@ -133,10 +134,12 @@ public class App
     private static void run() throws Exception{
         var httpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
 
-        Path testFile = Paths.get("Apollo.gif");
+        Path testFile = Paths.get("/home/siva/Videos/Apollo.gif");
 
         var client = new TusClient();
-        client.setUploadCreationURL(URI.create("http://localhost:8081/upload").toURL());
+
+        client.setHeaders(Map.of("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaXZhc2tvQHNpdmFrdW1hci5jb20iLCJpYXQiOjE3MDg5NDY3MTQsImV4cCI6MTcwODk0ODUxNH0.IbSkPtmjP9ROExrRoyqBY4I6WW5DlxlRBsa5eRdtqTY"));
+        client.setUploadCreationURL(URI.create("http://localhost:8080/file/upload").toURL());
         client.enableResuming(new TusURLMemoryStore());
 
         TusUpload upload = new TusUpload(testFile.toFile());
@@ -152,7 +155,7 @@ public class App
                     long bytesUploaded = uploader.getOffset();
                     double progress = (double) bytesUploaded / totalBytes * 100;
 
-                    System.out.printf("Upload at %6.2f %%.\n", progress);
+                    System.out.printf("Upload at %6.2f %%.%n", progress);
                 }
                 while (uploader.uploadChunk() > -1);
 

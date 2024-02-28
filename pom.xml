@@ -17,11 +17,11 @@
   <name>Drive</name>
   <url>http://maven.apache.org</url>
   <modules>
-<!--    <module>FileManagementService</module>-->
     <module>discovery-server</module>
-<!--    <module>TusClient</module>-->
     <module>identity-service</module>
     <module>api-gateway</module>
+      <module>ChunkStorageService</module>
+    <module>Drive-client</module>
   </modules>
 
   <properties>

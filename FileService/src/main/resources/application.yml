@@ -8,8 +8,12 @@ spring:
     name: file-service
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
+  servlet:
+    multipart:
+      max-request-size: 50KB
+      max-file-size: 50KB
 
 eureka:
   client:
@@ -22,7 +26,8 @@ eureka:
 server:
   port: 0
 
-
+app:
+  tus-upload-directory=/storage
 
 
 

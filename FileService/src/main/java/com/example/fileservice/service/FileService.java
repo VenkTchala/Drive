@@ -9,14 +9,20 @@ import com.example.fileservice.entity.FileUser;
 import com.example.fileservice.repository.FileMetaDataRepository;
 import com.example.fileservice.repository.FileRepository;
 import com.example.fileservice.repository.FileUserRepository;
+import com.google.common.io.ByteSink;
 import com.google.common.io.Files;
 import com.scalified.tree.TreeNode;
 import com.scalified.tree.multinode.ArrayMultiTreeNode;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.desair.tus.server.TusFileUploadService;
+import me.desair.tus.server.exception.TusException;
+import me.desair.tus.server.upload.UploadInfo;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
@@ -31,6 +37,8 @@ public class FileService {
     private final FileMetaDataRepository fileMetaDataRepository;
     private final FileUserRepository fileUserRepository;
     private final FileRepository fileRepository;
+    private final TusFileUploadService tusUploadService;
+    private final int maxChunkSize = 50000;
 
 
     public void createUser(String username){
@@ -64,6 +72,84 @@ public class FileService {
         fileMetaDataRepository.save(homeFileMetaData);
     }
 
+    public void upload(HttpServletRequest request , HttpServletResponse response) throws IOException{
+        this.tusUploadService.process(request, response);
+
+        String uploadURI = request.getRequestURI();
+
+        String uri = request.getRequestURI();
+
+        UploadInfo uploadInfo = null;
+
+        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage");
+
+        try {
+            uploadInfo = this.tusUploadService.getUploadInfo(uploadURI);
+        } catch (IOException | TusException e) {
+            log.error("get upload info : ", e);
+        }
+        if (uploadInfo != null && !uploadInfo.isUploadInProgress()) {
+            try (InputStream is = this.tusUploadService.getUploadedBytes(uploadURI)) {
+                Path output = rootPath.resolve(uploadInfo.getFileName());
+                Files.createParentDirs(output.toFile());
+                log.error("hai");
+//                java.nio.file.Files.copy(is, output, StandardCopyOption.REPLACE_EXISTING);
+
+            final byte[] buffer = new byte[maxChunkSize];
+
+            log.error("hai 2");
+
+            int dataRead = is.read(buffer) ;
+
+            log.error("size :" + dataRead);
+
+            int i =0;
+
+            List<File> filesChunks = new ArrayList<>();
+
+            while (dataRead > -1) {
+                File fileChunk = stageFile(buffer, dataRead);
+                log.error("size :" + dataRead);
+                log.error(" i : " + i++);
+                filesChunks.add(fileChunk);
+                dataRead = is.read(buffer);
+//                Files.write(buffer,rootPath.toFile());
+            }
+
+            } catch (Exception e) {
+                log.error("get uploaded bytes", e);
+            }
+
+            try {
+                this.tusUploadService.deleteUpload(uploadURI);
+            } catch (IOException | TusException e) {
+                log.error("delete upload", e);
+            }
+
+
+            log.error("oooo");
+
+        }
+    }
+
+
+    private File stageFile(byte[] buffer, int length) throws IOException {
+
+        File storageFile = new File(ClassLoader.getSystemResource(".").getFile() + "/Storage");
+
+        File outPutFile = File.createTempFile("file-", "-split", storageFile);
+
+//        try(FileOutputStream fos = new FileOutputStream(outPutFile)) {
+//            fos.write(buffer, 0, length);
+//        }
+
+        log.error("Filename : " + outPutFile.getPath());
+        ByteSink byteSink = Files.asByteSink(outPutFile);
+        byteSink.write(buffer);
+
+        Files.touch(outPutFile);
+        return outPutFile;
+    }
 
     public void createFileStructure(String username , FileTreeStructure request){
         FileUser user = fileUserRepository.getFileUserByUsername(username)
@@ -131,6 +217,8 @@ public class FileService {
 
         fileRepository.delete(file);
     }
+
+
 
     public Set<FileResponse> getFilesInFolder(FilePath path , String username){
         DriveFile driveFile = fileRepository.findByPath(path.getPath())
