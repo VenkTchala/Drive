@@ -22,6 +22,9 @@ module com.example.driveclient {
 
     opens com.example.driveclient to javafx.fxml;
     exports com.example.driveclient;
-    opens com.edencoding.models.openVision to gson;
-    opens com.edencoding.models.dogs to gson;
+    exports com.example.driveclient.dto;
+
+//    opens com.edencoding.models.openVision to gson;
+//    opens com.edencoding.models.dogs to gson;
+    opens  com.example.driveclient.dto to gson;
 }

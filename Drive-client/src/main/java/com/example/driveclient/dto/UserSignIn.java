@@ -1,5 +1,6 @@
 package com.example.driveclient.dto;
 
+import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

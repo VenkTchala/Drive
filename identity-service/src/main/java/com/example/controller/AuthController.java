@@ -2,9 +2,10 @@ package com.example.controller;
 
 import com.example.dto.AuthRequest;
 import com.example.dto.RegisterUserDto;
+import com.example.dto.SignInStatus;
+import com.example.dto.TokenDto;
 import com.example.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,28 +15,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService service;
+    private final AuthService authService;
 
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public void addNewUser(@RequestBody RegisterUserDto registerUserDto) {
-        service.saveUser(registerUserDto);
+    public SignInStatus addNewUser(@RequestBody RegisterUserDto registerUserDto) {
+        return  authService.saveUser(registerUserDto);
     }
 
     @PostMapping("/token")
-    public String getToken(@RequestBody AuthRequest authRequest) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        if (authenticate.isAuthenticated()) {
-            return service.generateToken(authRequest.getUsername());
-        } else {
-            throw new RuntimeException("invalid access");
-        }
+    public TokenDto getToken(@RequestBody AuthRequest authRequest) {
+        return authService.login(authRequest);
     }
 
     @GetMapping("/validate")
     public boolean validateToken(@RequestParam("token") String token) {
-        service.validateToken(token);
+        authService.validateToken(token);
         return true;
     }
 }

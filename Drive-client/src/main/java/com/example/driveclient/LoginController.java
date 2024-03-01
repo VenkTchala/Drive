@@ -10,9 +10,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class HelloController {
-    @FXML
-    private Label welcomeText;
+public class LoginController {
 
     public void toSignInPage(ActionEvent event) throws IOException {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
