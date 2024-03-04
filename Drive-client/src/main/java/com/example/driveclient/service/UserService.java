@@ -1,5 +1,6 @@
 package com.example.driveclient.service;
 
+import com.example.driveclient.dto.AuthRequest;
 import com.example.driveclient.dto.UserSignIn;
 import com.example.driveclient.util.JsonMapper;
 import com.mashape.unirest.http.HttpResponse;
@@ -17,4 +18,14 @@ public class UserService {
                      .body(body)
                      .asJson();
     }
+
+    public static HttpResponse<JsonNode> logIn (AuthRequest authRequest) throws UnirestException{
+        final String body = JsonMapper.getJson(authRequest);
+
+        return Unirest.post("http://localhost:8080/auth/token")
+                .header("Content-Type", "application/json")
+                .body(body)
+                .asJson();
+    }
+
 }

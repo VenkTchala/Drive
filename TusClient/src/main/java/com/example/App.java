@@ -33,9 +33,7 @@ public class App
     public static void main( String[] args ) throws Exception
     {
         run();
-
 //        try {
-//
 ////            FTPClient ftpClient = ftpClient();
 ////            long currentTimeMillis = System.currentTimeMillis();
 //
@@ -138,7 +136,11 @@ public class App
 
         var client = new TusClient();
 
-        client.setHeaders(Map.of("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaXZhc2tvQHNpdmFrdW1hci5jb20iLCJpYXQiOjE3MDg5NDY3MTQsImV4cCI6MTcwODk0ODUxNH0.IbSkPtmjP9ROExrRoyqBY4I6WW5DlxlRBsa5eRdtqTY"));
+        client.setHeaders(Map.of("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaXZhQHNrby5jb20iLCJpYXQiOjE3MDk1MjA1MzEsImV4cCI6MTcwOTUyMjMzMX0.8bA_ZzFLsc6q2K5JfGgcxDoFhKgrC-W7vbc4czQd93s",
+                "filename" , testFile.getFileName().toString(),
+                "parentpath", "/"
+                ));
+
         client.setUploadCreationURL(URI.create("http://localhost:8080/file/upload").toURL());
         client.enableResuming(new TusURLMemoryStore());
 

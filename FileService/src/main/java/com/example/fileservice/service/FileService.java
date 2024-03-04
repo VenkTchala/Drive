@@ -9,13 +9,13 @@ import com.example.fileservice.entity.FileUser;
 import com.example.fileservice.repository.FileMetaDataRepository;
 import com.example.fileservice.repository.FileRepository;
 import com.example.fileservice.repository.FileUserRepository;
-import com.google.common.io.ByteSink;
 import com.google.common.io.Files;
 import com.scalified.tree.TreeNode;
 import com.scalified.tree.multinode.ArrayMultiTreeNode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import me.desair.tus.server.TusFileUploadService;
 import me.desair.tus.server.exception.TusException;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.InvalidParameterException;
 import java.time.Instant;
 import java.util.*;
@@ -75,13 +76,20 @@ public class FileService {
     public void upload(HttpServletRequest request , HttpServletResponse response) throws IOException{
         this.tusUploadService.process(request, response);
 
+        String requestFileName = request.getHeader("filename");
+        String requestPath =  request.getHeader("parentpath");
+        String email =  request.getHeader("loggedInUser");
+
+        log.error( "error : " + request.getHeader("loggedInUser"));
+
+        Instant now = Instant.now();
+
         String uploadURI = request.getRequestURI();
-
-        String uri = request.getRequestURI();
-
+//        String uri = request.getRequestURI();
         UploadInfo uploadInfo = null;
 
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage");
+        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage" + requestPath);
+        log.error("rootpath : " + rootPath);
 
         try {
             uploadInfo = this.tusUploadService.getUploadInfo(uploadURI);
@@ -92,29 +100,57 @@ public class FileService {
             try (InputStream is = this.tusUploadService.getUploadedBytes(uploadURI)) {
                 Path output = rootPath.resolve(uploadInfo.getFileName());
                 Files.createParentDirs(output.toFile());
-                log.error("hai");
-//                java.nio.file.Files.copy(is, output, StandardCopyOption.REPLACE_EXISTING);
+                java.nio.file.Files.copy(is, output, StandardCopyOption.REPLACE_EXISTING);
 
-            final byte[] buffer = new byte[maxChunkSize];
+            DriveFile parent =
+                fileRepository.findByPath(requestPath).orElseThrow(IllegalArgumentException::new);
 
-            log.error("hai 2");
+            if(fileRepository.existsByPath(requestFileName))
+                return;
 
-            int dataRead = is.read(buffer) ;
+            DriveFile newFile = DriveFile.builder()
+                    .fileName(requestFileName)
+                    .children(new HashSet<>())
+                    .parent(parent)
+                    .isDirectory(false)
+                    .path(requestPath + requestFileName)
+                    .build();
 
-            log.error("size :" + dataRead);
+            fileRepository.save(newFile);
 
-            int i =0;
+            log.error(rootPath.toString());
 
-            List<File> filesChunks = new ArrayList<>();
+            File file =
+                     rootPath.resolve(Paths.get(requestFileName)).toFile();
 
-            while (dataRead > -1) {
-                File fileChunk = stageFile(buffer, dataRead);
-                log.error("size :" + dataRead);
-                log.error(" i : " + i++);
-                filesChunks.add(fileChunk);
-                dataRead = is.read(buffer);
-//                Files.write(buffer,rootPath.toFile());
-            }
+            log.error(file.getAbsolutePath());
+
+                Long fileSize = file.length();
+
+                log.error("name : " + file.getName());
+                log.error("size : " + fileSize);
+
+//            while (dataRead > -1) {
+//                fileSize += dataRead;
+//
+//                File fileChunk = stageFile(buffer, dataRead, parent);
+//                filesChunks.add(fileChunk);
+//                dataRead = is.read(buffer);
+////                Files.write(buffer,rootPath.toFile());
+//            }
+
+            FileUser user = fileUserRepository.findDistinctByUsername(email)
+                    .orElseThrow(IllegalArgumentException::new);
+
+            FileMetaData metaData = FileMetaData.builder()
+                    .modificationDate(now)
+                    .creationDate(now)
+                    .owner(user)
+                    .size(fileSize)
+                    .file(newFile)
+                    .build();
+
+            fileMetaDataRepository.save(metaData);
 
             } catch (Exception e) {
                 log.error("get uploaded bytes", e);
@@ -125,34 +161,31 @@ public class FileService {
             } catch (IOException | TusException e) {
                 log.error("delete upload", e);
             }
-
-
-            log.error("oooo");
-
         }
     }
 
 
-    private File stageFile(byte[] buffer, int length) throws IOException {
-
-        File storageFile = new File(ClassLoader.getSystemResource(".").getFile() + "/Storage");
-
-        File outPutFile = File.createTempFile("file-", "-split", storageFile);
-
-//        try(FileOutputStream fos = new FileOutputStream(outPutFile)) {
-//            fos.write(buffer, 0, length);
-//        }
-
-        log.error("Filename : " + outPutFile.getPath());
-        ByteSink byteSink = Files.asByteSink(outPutFile);
-        byteSink.write(buffer);
-
-        Files.touch(outPutFile);
-        return outPutFile;
-    }
+//    private File stageFile(byte[] buffer, int length,DriveFile file) throws IOException {
+//
+//        File storageFile = new File(ClassLoader.getSystemResource(".").getFile() + "/Storage");
+//        File outPutFile = File.createTempFile("file-", "-split", storageFile);
+//
+////        try(FileOutputStream fos = new FileOutputStream(outPutFile)) {
+////            fos.write(buffer, 0, length);
+////        }
+//
+//        ByteSink byteSink = Files.asByteSink(outPutFile);
+//        byteSink.write(buffer);
+//
+//        Files.touch(outPutFile);
+//        file.getChunks().add(outPutFile.getName());
+//        fileRepository.save(file);
+//
+//        return outPutFile;
+//    }
 
     public void createFileStructure(String username , FileTreeStructure request){
-        FileUser user = fileUserRepository.getFileUserByUsername(username)
+        FileUser user = fileUserRepository.findDistinctByUsername(username)
                 .orElseThrow(IllegalArgumentException::new);
 
         preOrderCreate(request,user);
@@ -195,8 +228,8 @@ public class FileService {
     }
 
     public void deleteFile(String username, FilePath path){
-        FileUser user = fileUserRepository.getFileUserByUsername(username).orElseThrow(IllegalArgumentException::new);
-
+        FileUser user = fileUserRepository.findDistinctByUsername(username)
+                .orElseThrow(IllegalArgumentException::new);
         postOrderDelete(path.getPath(),user);
     }
 
@@ -251,7 +284,6 @@ public class FileService {
 
     public FileTreeStructure testReadFiles(String username){
 
-        log.error(username);
         File test = new File("/home/siva/Documents/assignments");
         Path base = Paths.get(test.getPath());
 

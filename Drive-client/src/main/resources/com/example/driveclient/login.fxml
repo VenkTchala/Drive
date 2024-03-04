@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Text?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.driveclient.LoginController">
+<BorderPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.driveclient.LoginController">
    <left>
       <AnchorPane prefHeight="500.0" prefWidth="350.0" style="-fx-background-color: #05988f;" BorderPane.alignment="CENTER">
          <children>
@@ -26,17 +26,17 @@
    <center>
       <AnchorPane prefHeight="500.0" prefWidth="423.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField layoutX="133.0" layoutY="215.0" prefHeight="27.0" prefWidth="293.0" promptText="Email" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px; -fx-padding: 0px 0px 0px 5px;">
+            <TextField fx:id="email" layoutX="133.0" layoutY="215.0" prefHeight="27.0" prefWidth="293.0" promptText="Email" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px; -fx-padding: 0px 0px 0px 5px;">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-            <PasswordField layoutX="133.0" layoutY="277.0" prefHeight="27.0" prefWidth="292.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px; -fx-padding: 0px 0px 0px 5px;">
+            <PasswordField fx:id="passwordField" layoutX="133.0" layoutY="277.0" prefHeight="27.0" prefWidth="292.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px; -fx-padding: 0px 0px 0px 5px;">
                <font>
                   <Font size="18.0" />
                </font>
             </PasswordField>
-            <Button alignment="CENTER" layoutX="126.0" layoutY="346.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="75.0" style="-fx-background-color: #05988f; -fx-border-radius: 8px; -fx-background-radius: 8px;" text="Login" textFill="WHITE">
+            <Button alignment="CENTER" layoutX="126.0" layoutY="346.0" mnemonicParsing="false" onAction="#doLogin" prefHeight="40.0" prefWidth="75.0" style="-fx-background-color: #05988f; -fx-border-radius: 8px; -fx-background-radius: 8px;" text="Login" textFill="WHITE">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>

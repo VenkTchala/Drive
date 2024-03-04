@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +33,7 @@ public class AuthService {
 
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    private final WebClient.Builder webclientBuilder;
 
     public SignInStatus saveUser(RegisterUserDto registerUserDto) {
 
@@ -80,11 +82,24 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         driveUserRepository.save(user);
+        createUserHomeDirectory(email);
 
         return SignInStatus.builder()
                 .sucess(true)
                 .errorMessage(null)
                 .build();
+
+    }
+
+    private void createUserHomeDirectory(String username){
+        webclientBuilder.build()
+                .post()
+                .uri("http://file-service/file/createuser")
+                .header("loggedInUser",username)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .subscribe();
+
 
     }
 

@@ -12,9 +12,8 @@ import java.time.Instant;
 @Getter
 @Setter
 @Builder
-public class ChunkBin {
+public class Chunk {
     @Id
     private Long id;
-    private Instant deletionRequest;
     private String chunkName;
 }

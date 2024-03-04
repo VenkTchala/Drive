@@ -3,6 +3,7 @@ package com.example.fileservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,7 @@ public class DriveFile {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id" )
     private DriveFile parent;
+
     @OneToMany(mappedBy = "parent",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,

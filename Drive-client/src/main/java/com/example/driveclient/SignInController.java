@@ -38,7 +38,7 @@ public class SignInController implements Initializable {
 
     private StringProperty errorMessage = new SimpleStringProperty();
 
-    private SiginModel siginModel = new SiginModel();
+    private final SiginModel siginModel = new SiginModel();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -57,7 +57,6 @@ public class SignInController implements Initializable {
     }
 
     public void toLogInPage(Event event) {
-//        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         try {
             Stage stage = DriveApplication.getMainStage();
             FXMLLoader signInLoader = new FXMLLoader(getClass().getResource("login.fxml"));

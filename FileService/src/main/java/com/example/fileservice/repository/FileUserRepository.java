@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface FileUserRepository extends JpaRepository<FileUser,Long> {
     boolean existsByUsername(String username);
-    Optional<FileUser> getFileUserByUsername(String username);
+    Optional<FileUser> findDistinctByUsername(String username);
 }

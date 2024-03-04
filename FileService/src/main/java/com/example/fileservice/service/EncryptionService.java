@@ -32,7 +32,7 @@ public class EncryptionService {
         }
 
         FileUser user = fileUserRepository
-                .getFileUserByUsername(username)
+                .findDistinctByUsername(username)
                 .orElseThrow(IllegalAccessError::new);
 
         UserPubKey userPubKey = UserPubKey

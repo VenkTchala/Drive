@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.driveclient.FileManagerController">
+   <left>
+      <VBox prefHeight="800.0" prefWidth="316.0" style="-fx-background-color: #e9edf6; -fx-padding: 20px 8px 8px 20px;" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="41.0" prefWidth="288.0">
+               <children>
+                  <FontIcon iconColor="#05988f" iconLiteral="fab-google-drive" iconSize="50" selectionFill="BLACK" />
+               </children>
+            </HBox>
+            <HBox prefHeight="76.0" prefWidth="288.0" spacing="12" style="-fx-padding: 50px 0px 0px 0px; -fx-border-insets: 50px 0px 0px 0px; -fx-background-insets: 50px 0px 0px 0px;">
+               <children>
+                  <FontIcon iconColor="#05988f" iconLiteral="fas-home" iconSize="20" />
+                  <Text fill="#05988f" strokeType="OUTSIDE" strokeWidth="0.0" text="Home">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </HBox>
+            <HBox prefHeight="53.0" prefWidth="288.0" spacing="12" style="-fx-padding: 20px 0px 0px 0px; -fx-border-insets: 20px 0px 0px 0px; -fx-background-insets: 20px 0px 0px 0px;">
+               <children>
+                  <FontIcon iconColor="#05988f" iconLiteral="fas-users" iconSize="20" />
+                  <Text fill="#05988f" strokeType="OUTSIDE" strokeWidth="0.0" text="Shared with me" wrappingWidth="147.239990234375">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </HBox>
+            <HBox prefHeight="51.0" prefWidth="288.0" spacing="12" style="-fx-padding: 20px 0px 0px 0px; -fx-background-insets: 20px 0px 0px 0px; -fx-background-insets: 20px 0px 0px 0px;">
+               <children>
+                  <FontIcon iconColor="#05988f" iconLiteral="fas-trash">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </FontIcon>
+                  <Text fill="#05988f" strokeType="OUTSIDE" strokeWidth="0.0" text="Bin">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </HBox>
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <AnchorPane prefHeight="694.0" prefWidth="784.0" BorderPane.alignment="CENTER">
+         <children>
+            <TableView fx:id="table" layoutX="29.0" layoutY="92.0" prefHeight="690.0" prefWidth="827.0">
+               <columns>
+                  <TableColumn fx:id="name" prefWidth="468.0" style="-fx-padding: 0px 0px 0px 20px;" text="Name" />
+                  <TableColumn fx:id="owner" prefWidth="120.0" style="-fx-padding: 0px 0px 0px 20px;" text="Owner" />
+                  <TableColumn fx:id="size" prefWidth="116.0" resizable="false" style="-fx-padding: 0px 0px 0px 20px;" text="Size" />
+                  <TableColumn fx:id="modifiedAt" prefWidth="123.0" style="-fx-padding: 0px 0px 0px 20px;" text="Modified at" />
+               </columns>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </TableView>
+            <TextField layoutX="67.0" layoutY="39.0" prefHeight="22.0" prefWidth="489.0" text="/home/">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </TextField>
+            <FontIcon iconColor="#05988f" iconLiteral="far-arrow-alt-circle-left" iconSize="25" layoutX="19.0" layoutY="59.0" wrappingWidth="20.875">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </FontIcon>
+            <HBox alignment="CENTER_LEFT" layoutX="728.0" layoutY="31.0" prefHeight="38.0" prefWidth="115.0" spacing="10.0" style="-fx-padding: 0px 0px 0px 8px; -fx-background-color: #e9edf6; -fx-background-radius: 20px; -fx-border-radius: 20px;">
+               <children>
+                  <FontIcon iconColor="#05988f" iconLiteral="fas-plus" iconSize="28" />
+                  <Text fill="#05988f" strokeType="OUTSIDE" strokeWidth="0.0" text="Upload">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>
