@@ -3,19 +3,27 @@ package com.example.fileservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
-@Builder
-public class DriveFile {
+public class DeletedFile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String fileName;
+
+    @Temporal(value = TemporalType.DATE)
+    private LocalDate deletionInstant;
+
     @ManyToOne
     private FileUser user;
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+
+    private String name;
+
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY ,orphanRemoval = true)
     private FileMetadata metaData;
 }

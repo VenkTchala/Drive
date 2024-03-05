@@ -20,7 +20,6 @@ import java.io.IOException;
 public class Uploadcontroller {
 
     private final FileService fileService;
-//    private final Path uploadPath = Paths.get(ClassLoader.getSystemResource("./storage").getPath());
     @RequestMapping(value = { "/upload", "/upload/**" }, method = { RequestMethod.POST,
             RequestMethod.PATCH, RequestMethod.HEAD, RequestMethod.DELETE, RequestMethod.GET })
     public void upload(HttpServletRequest servletRequest,

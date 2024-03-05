@@ -1,13 +1,11 @@
 package com.example.service;
 
 import com.example.Mapper.UserMapper;
-import com.example.dto.AuthRequest;
-import com.example.dto.RegisterUserDto;
-import com.example.dto.SignInStatus;
-import com.example.dto.TokenDto;
+import com.example.dto.*;
 import com.example.entity.DriveUser;
 import com.example.repository.DriveUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -100,7 +98,6 @@ public class AuthService {
                 .bodyToMono(Void.class)
                 .subscribe();
 
-
     }
 
     public TokenDto login(AuthRequest authRequest){
@@ -153,6 +150,28 @@ public class AuthService {
         Pattern validName = Pattern.compile("^[^- '](?=(?!\\p{Lu}?\\p{Lu}))(?=(?!\\p{Ll}+\\p{Lu}))(?=(?!.*\\p{Lu}\\p{Lu}))(?=(?!.*[- '][- '.]))(?=(?!.*[.][-'.]))(\\p{L}|[- '.]){2,}$");
         Matcher matcher = validName.matcher(name);
         return  matcher.matches();
+    }
+
+
+    public UserInfo userInfo(String email){
+        log.error("email : " + email);
+
+        try {
+            DriveUser user =
+                    driveUserRepository.getDriveUserByEmail(email).orElseThrow(IllegalArgumentException::new);
+            return UserInfo.builder()
+                    .exists(true)
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .build();
+        }
+        catch (IllegalArgumentException e){
+
+            return UserInfo.builder()
+                    .exists(false)
+                    .build();
+        }
     }
 
 }

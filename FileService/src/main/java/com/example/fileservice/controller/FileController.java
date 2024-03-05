@@ -1,17 +1,17 @@
 package com.example.fileservice.controller;
 
-import com.example.fileservice.dto.FilePath;
-import com.example.fileservice.dto.FileResponse;
-import com.example.fileservice.dto.FileTreeStructure;
-import com.example.fileservice.entity.FileUser;
-import com.example.fileservice.repository.FileUserRepository;
+import com.example.fileservice.dto.DeleteRequest;
+import com.example.fileservice.dto.FileRequest;
+import com.example.fileservice.dto.Status;
 import com.example.fileservice.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 @RestController()
 @RequestMapping("/file")
@@ -19,28 +19,33 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class FileController {
     private final FileService fileService;
-    private final FileUserRepository fileUserRepository;
-
-    @GetMapping
-    public FileTreeStructure getFiles(@RequestHeader("loggedInUser") String username){
-        return  fileService.testReadFiles(username);
-    }
-
     @PostMapping("/createuser")
-    public void createUser(@RequestHeader("loggedInUser") String username){
+    public void createUser(@RequestHeader("loggedInUser") String username) throws IOException{
          fileService.createUser(username);
     }
-
-    public void copyFiles(@RequestHeader("loggedInUser") String username , FileTreeStructure request){
-        fileService.createFileStructure(username, request);
-    }
-
-    public Set<FileResponse> getFilesInFolder(@RequestHeader("loggedInUser") String username , FilePath path){
-        return fileService.getFilesInFolder(path,username);
-    }
     @PostMapping("/deletefile")
-    public void deleteFiles(@RequestHeader("loggedInUser") String username, FilePath filePath){
-        fileService.deleteFile(username,filePath);
+    public Status deleteFiles(@RequestHeader("loggedInUser") String username, @RequestBody DeleteRequest request){
+    return fileService.deleteFile(request.getId() , username);
+    }
+
+    @PostMapping("/restorefile")
+    public Status restoreFile(@RequestHeader("loggedInUser") String username, @RequestBody DeleteRequest request){
+        return fileService.restoreFile(request, username);
+    }
+
+    @GetMapping("/files")
+    public List<FileRequest> getAllFiles(@RequestHeader("loggedInUser") String username){
+        return fileService.getFilesOfUser(username);
+    }
+
+    @GetMapping("/trash")
+    public List<FileRequest> getAllFilesInTrash(@RequestHeader("loggedInUser")String username){
+        return fileService.getUserTrash(username);
+    }
+
+    @GetMapping(path = "/download")
+    public ResponseEntity<Resource> download(@RequestHeader("loggedInUser") String username , @RequestParam String name) {
+        return fileService.downloadFile(username,name);
     }
 
 }

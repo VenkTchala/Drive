@@ -1,9 +1,6 @@
 package com.example.controller;
 
-import com.example.dto.AuthRequest;
-import com.example.dto.RegisterUserDto;
-import com.example.dto.SignInStatus;
-import com.example.dto.TokenDto;
+import com.example.dto.*;
 import com.example.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-
-    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
     public SignInStatus addNewUser(@RequestBody RegisterUserDto registerUserDto) {
@@ -34,4 +29,10 @@ public class AuthController {
         authService.validateToken(token);
         return true;
     }
+
+    @GetMapping("/userinfo")
+    public UserInfo getUserInfo(@RequestParam("email") String email){
+        return authService.userInfo(email);
+    }
+
 }

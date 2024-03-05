@@ -1,4 +1,4 @@
-package com.example.driveclient.dto;
+package com.example.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,12 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class UserSignIn {
+public class UserInfo {
+    private boolean exists;
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
 }

@@ -20,8 +20,7 @@
     <module>discovery-server</module>
     <module>identity-service</module>
     <module>api-gateway</module>
-      <module>ChunkStorageService</module>
-    <module>Drive-client</module>
+    <module>FileService</module>
   </modules>
 
   <properties>
@@ -90,6 +89,31 @@
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
 
+
+<!--    <dependency>-->
+<!--      <groupId>com.google.guava</groupId>-->
+<!--      <artifactId>guava</artifactId>-->
+<!--      <version>31.1-jre</version>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <groupId>com.scalified</groupId>-->
+<!--      <artifactId>tree</artifactId>-->
+<!--      <version>0.2.5</version>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <groupId>io.tus.java.client</groupId>-->
+<!--      <artifactId>tus-java-client</artifactId>-->
+<!--      <version>0.5.0</version>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <groupId>commons-net</groupId>-->
+<!--      <artifactId>commons-net</artifactId>-->
+<!--      <version>3.9.0</version>-->
+<!--    </dependency>-->
+
 <!--    <dependency>-->
 <!--      <groupId>org.junit.jupiter</groupId>-->
 <!--      <artifactId>junit-jupiter-api</artifactId>-->
@@ -148,27 +172,27 @@
           </excludes>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.google.cloud.tools</groupId>
-        <artifactId>jib-maven-plugin</artifactId>
-        <version>3.2.1</version>
-        <configuration>
-          <from>
-            <image>eclipse-temurin:17.0.4.1_1-jre</image>
-          </from>
-          <to>
-            <image>registry.hub.docker.com/sivk23/${project.artifactId}</image>
-          </to>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>dockerBuild</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>com.google.cloud.tools</groupId>-->
+<!--        <artifactId>jib-maven-plugin</artifactId>-->
+<!--        <version>3.2.1</version>-->
+<!--        <configuration>-->
+<!--          <from>-->
+<!--            <image>eclipse-temurin:17.0.4.1_1-jre</image>-->
+<!--          </from>-->
+<!--          <to>-->
+<!--            <image>registry.hub.docker.com/sivk23/${project.artifactId}</image>-->
+<!--          </to>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>dockerBuild</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
     </plugins>
   </build>
 

@@ -12,9 +12,6 @@ public class TusServerConfig {
         return new TusFileUploadService()
                 .withDownloadFeature()
                 .withUploadUri("/file/upload");
-//                .withStoragePath(appProperties.getTusUploadDirectory())
-//                .withUploadURI("/upload");
-
     }
 
 }
