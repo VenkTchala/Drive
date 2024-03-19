@@ -2,6 +2,7 @@ package com.example.fileservice.controller;
 
 import com.example.fileservice.dto.DeleteRequest;
 import com.example.fileservice.dto.FileRequest;
+import com.example.fileservice.dto.RenameRequest;
 import com.example.fileservice.dto.Status;
 import com.example.fileservice.service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,11 @@ public class FileController {
     @PostMapping("/deletefile")
     public Status deleteFiles(@RequestHeader("loggedInUser") String username, @RequestBody DeleteRequest request){
     return fileService.deleteFile(request.getId() , username);
+    }
+
+    @PostMapping("/renamefile")
+    public Status renameFile(@RequestHeader("loggedInUser") String username , @RequestBody RenameRequest request){
+        return fileService.renameFile(username,request);
     }
 
     @PostMapping("/restorefile")

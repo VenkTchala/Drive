@@ -2,6 +2,7 @@ package com.example.fileservice.service;
 
 import com.example.fileservice.dto.DeleteRequest;
 import com.example.fileservice.dto.FileRequest;
+import com.example.fileservice.dto.RenameRequest;
 import com.example.fileservice.dto.Status;
 import com.example.fileservice.entity.DeletedFile;
 import com.example.fileservice.entity.DriveFile;
@@ -14,24 +15,25 @@ import com.google.common.io.Files;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import me.desair.tus.server.TusFileUploadService;
 import me.desair.tus.server.exception.TusException;
 import me.desair.tus.server.upload.UploadInfo;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.InvalidParameterException;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -44,10 +46,8 @@ public class FileService {
     private final TusFileUploadService tusUploadService;
     private final DeletedFileRepository deletedFileRepository;
 
-
-
-    public void createUser(String username) throws IOException{
-        if(fileUserRepository.existsByUsername(username))
+    public void createUser(String username) throws IOException {
+        if (fileUserRepository.existsByUsername(username))
             throw new InvalidParameterException(username);
 
         FileUser user = FileUser.builder()
@@ -55,21 +55,28 @@ public class FileService {
                 .build();
         fileUserRepository.save(user);
 
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator + username);
+        Path rootPath = Paths.get("Storage", username);
         Files.createParentDirs(rootPath.toFile());
     }
 
-    public void upload(HttpServletRequest request , HttpServletResponse response) throws IOException{
+    public void upload(HttpServletRequest request, HttpServletResponse response) throws IOException {
         this.tusUploadService.process(request, response);
 
-        String email =  request.getHeader("loggedInUser");
+        String email = request.getHeader("loggedInUser");
+
+        String fileIdString = request.getHeader("fileId");
+
+        Long filedId = null;
+
+        if (fileIdString != null)
+            filedId = Long.parseLong(fileIdString);
+
 
         String uploadURI = request.getRequestURI();
 
         UploadInfo uploadInfo = null;
 
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator + email );
-
+        Path rootPath = Paths.get("Storage", email);
         try {
             uploadInfo = this.tusUploadService.getUploadInfo(uploadURI);
         } catch (IOException | TusException e) {
@@ -83,16 +90,33 @@ public class FileService {
 
                 FileUser user = fileUserRepository.findDistinctByUsername(email).orElseThrow(IllegalArgumentException::new);
 
-                DriveFile file = DriveFile.builder()
-                        .fileName(uploadInfo.getFileName())
-                        .metaData(
-                                FileMetadata.builder()
-                                        .size(uploadInfo.getLength())
-                                        .creationDate(Instant.now())
-                                        .build()
-                        )
-                        .user(user)
-                        .build();
+                DriveFile file;
+
+                if (fileIdString == null) {
+                    file = DriveFile.builder()
+                            .fileName(uploadInfo.getFileName())
+                            .metaData(
+                                    FileMetadata.builder()
+                                            .size(uploadInfo.getLength())
+                                            .creationDate(Instant.now())
+                                            .build()
+                            )
+                            .user(user)
+                            .build();
+                } else {
+
+                    file = fileRepository.findById(filedId)
+                            .orElseThrow(IllegalArgumentException::new);
+
+                    String oldName = file.getFileName();
+
+                    file.setFileName(uploadInfo.getFileName());
+                    FileMetadata metadata = file.getMetaData();
+                    metadata.setSize(uploadInfo.getLength());
+                    metadata.setCreationDate(Instant.now());
+
+                    forgetFile(oldName, email);
+                }
 
                 fileRepository.save(file);
 
@@ -109,23 +133,21 @@ public class FileService {
     }
 
 
-
-    public Status deleteFile(Long id , String email){
-        DriveFile  file;
+    public Status deleteFile(Long id, String email) {
+        DriveFile file;
         try {
             file = fileRepository.findById(id)
                     .orElseThrow(IllegalArgumentException::new);
-        }
-        catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return Status.builder()
                     .status(false)
                     .errMsg("Something went wrong")
                     .build();
         }
 
-        log.error( "Owner : " + file.getUser().getUsername() + " email : " + email);
+        log.error("Owner : " + file.getUser().getUsername() + " email : " + email);
 
-        if(!file.getUser().getUsername().equals(email))
+        if (!file.getUser().getUsername().equals(email))
             return Status.builder()
                     .status(false)
                     .errMsg("Acess denied for file")
@@ -135,10 +157,9 @@ public class FileService {
 
         try {
 
-             user = fileUserRepository.findDistinctByUsername(email)
+            user = fileUserRepository.findDistinctByUsername(email)
                     .orElseThrow(IllegalArgumentException::new);
-        }
-        catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return Status.builder()
                     .status(false)
                     .errMsg("Something went wrong")
@@ -146,15 +167,15 @@ public class FileService {
         }
 
         DeletedFile deletedFile =
-        DeletedFile.builder()
-                .user(user)
-                .deletionInstant(LocalDate.now())
-                .metaData(FileMetadata.builder()
-                        .creationDate(file.getMetaData().getCreationDate())
-                        .size(file.getMetaData().getSize())
-                        .build())
-                .name(file.getFileName())
-                .build();
+                DeletedFile.builder()
+                        .user(user)
+                        .deletionInstant(LocalDate.now())
+                        .metaData(FileMetadata.builder()
+                                .creationDate(file.getMetaData().getCreationDate())
+                                .size(file.getMetaData().getSize())
+                                .build())
+                        .name(file.getFileName())
+                        .build();
 
         deletedFileRepository.save(deletedFile);
 
@@ -166,7 +187,7 @@ public class FileService {
                 .build();
     }
 
-    public List<FileRequest> getUserTrash(String username){
+    public List<FileRequest> getUserTrash(String username) {
         FileUser user;
 
         try {
@@ -181,28 +202,25 @@ public class FileService {
                             .owner(user.getUsername())
                             .build())
                     .toList();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return List.of();
         }
     }
 
-    public Status restoreFile(DeleteRequest request, String email){
-//        deletedFileRepository
+    public Status restoreFile(DeleteRequest request, String email) {
 
-        DeletedFile  file;
+        DeletedFile file;
         try {
             file = deletedFileRepository.findById(request.getId())
                     .orElseThrow(IllegalArgumentException::new);
-        }
-        catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return Status.builder()
                     .status(false)
                     .errMsg("Something went wrong")
                     .build();
         }
 
-        if(!file.getUser().getUsername().equals(email))
+        if (!file.getUser().getUsername().equals(email))
             return Status.builder()
                     .status(false)
                     .errMsg("Acess denied for file")
@@ -214,8 +232,7 @@ public class FileService {
 
             user = fileUserRepository.findDistinctByUsername(email)
                     .orElseThrow(IllegalArgumentException::new);
-        }
-        catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return Status.builder()
                     .status(false)
                     .errMsg("Something went wrong")
@@ -232,7 +249,6 @@ public class FileService {
                         .fileName(file.getName())
                         .build();
 
-//        deletedFileRepository.save(deletedFile);
         fileRepository.save(restoredFile);
 
         deletedFileRepository.delete(file);
@@ -243,27 +259,27 @@ public class FileService {
                 .build();
     }
 
-    public void deleteFile(DriveFile file,String email){
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator  + email + File.separator + file.getFileName());
-        rootPath.toFile().delete();
+    public void forgetFile(String name, String email) {
+        Path rootPath = Paths.get("Storage", email);
+
+        rootPath
+                .resolve(name)
+                .toFile().delete();
     }
 
-    public ResponseEntity<Resource> downloadFile(String username, String fileName){
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator + username + File.separator + fileName);
+    public ResponseEntity<Resource> downloadFile(String username, String fileName) {
+        Path rootPath = Paths.get("Storage", username,fileName);
 
         ByteArrayResource resource;
         try {
             resource = new ByteArrayResource(java.nio.file.Files.readAllBytes(rootPath));
 
-//            resource = new InputStreamResource(new FileInputStream(rootPath.toFile()));
 
             return ResponseEntity.ok()
-//                .headers(headers)
                     .contentLength(rootPath.toFile().length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(resource);
-        }
-        catch (IOException ioException){
+        } catch (IOException ioException) {
             return ResponseEntity.
                     notFound()
                     .build();
@@ -271,16 +287,71 @@ public class FileService {
 
     }
 
+    public Status renameFile(String email, RenameRequest request) {
 
-    public List<FileRequest> getFilesOfUser(String email){
+        DriveFile file;
+
+        try {
+            file = fileRepository.findById(request.getId())
+                    .orElseThrow(IllegalArgumentException::new);
+        } catch (IllegalArgumentException exception) {
+            return Status.builder()
+                    .status(false)
+                    .errMsg("Something went wrong")
+                    .build();
+        }
+
+        if (!file.getUser().getUsername().equals(email))
+            return Status.builder()
+                    .status(false)
+                    .errMsg("Access denied for file")
+                    .build();
+
+        FileUser user;
+        user = fileUserRepository.findDistinctByUsername(email)
+                .orElseThrow(IllegalArgumentException::new);
+
+        if(fileRepository.existsByUserAndFileName(user, request.getNewName())){
+            return Status.builder()
+                    .status(false)
+                    .errMsg("file with name " + request.getNewName() + " already exists.")
+                    .build();
+        }
+
+        Path source = Paths.get("Storage", email, file.getFileName());
+        file.setFileName(request.getNewName());
+
+        try {
+
+            java.nio.file.Files.move(source, source.resolveSibling(request.getNewName()));
+        }
+        catch (IOException exception){
+
+            log.error(exception.getClass().toString());
+            log.error(exception.getMessage());
+
+            return Status.builder()
+                    .status(false)
+                    .errMsg("Something went wrong")
+                    .build();
+        }
+
+        fileRepository.save(file);
+        return Status.builder()
+                .status(true)
+                .errMsg(null)
+                .build();
+
+    }
+
+    public List<FileRequest> getFilesOfUser(String email) {
         FileUser user;
         List<DriveFile> files;
         try {
             user = fileUserRepository.findDistinctByUsername(email)
                     .orElseThrow(IllegalArgumentException::new);
             files = fileRepository.getDriveFilesByUser(user);
-        }
-        catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return List.of();
         }
         return files.stream().map(i -> FileRequest.builder()
@@ -289,12 +360,12 @@ public class FileService {
                         .size(i.getMetaData().getSize())
                         .modificationDate(formatDate(i.getMetaData().getCreationDate()))
                         .owner(user.getUsername())
-                .build())
+                        .build())
                 .toList();
     }
 
-    private String formatDate(Instant instant){
-        return  DateTimeFormatter.ofPattern("dd-MM-yy")
+    private String formatDate(Instant instant) {
+        return DateTimeFormatter.ofPattern("dd-MM-yy")
                 .withZone(ZoneId.of("Asia/Kolkata"))
                 .format(instant);
     }

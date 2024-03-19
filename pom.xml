@@ -20,32 +20,13 @@
     <module>discovery-server</module>
     <module>identity-service</module>
     <module>api-gateway</module>
-    <module>FileService</module>
+    <module>file-service</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.boot</groupId>-->
-<!--      <artifactId>spring-boot-starter-data-jpa</artifactId>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.boot</groupId>-->
-<!--      <artifactId>spring-boot-starter-security</artifactId>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.boot</groupId>-->
-<!--      <artifactId>spring-boot-starter-web</artifactId>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.boot</groupId>-->
-<!--      <artifactId>spring-boot-devtools</artifactId>-->
-<!--      <scope>runtime</scope>-->
-<!--      <optional>true</optional>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -56,11 +37,6 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.security</groupId>-->
-<!--      <artifactId>spring-security-test</artifactId>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
 
     <dependency>
       <groupId>org.mapstruct</groupId>
@@ -90,43 +66,6 @@
     </dependency>
 
 
-<!--    <dependency>-->
-<!--      <groupId>com.google.guava</groupId>-->
-<!--      <artifactId>guava</artifactId>-->
-<!--      <version>31.1-jre</version>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>com.scalified</groupId>-->
-<!--      <artifactId>tree</artifactId>-->
-<!--      <version>0.2.5</version>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>io.tus.java.client</groupId>-->
-<!--      <artifactId>tus-java-client</artifactId>-->
-<!--      <version>0.5.0</version>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>commons-net</groupId>-->
-<!--      <artifactId>commons-net</artifactId>-->
-<!--      <version>3.9.0</version>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>org.junit.jupiter</groupId>-->
-<!--      <artifactId>junit-jupiter-api</artifactId>-->
-<!--      <version>5.9.2</version>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
-
-<!--    <dependency>-->
-<!--      <groupId>junit</groupId>     &lt;!&ndash; NOT org.junit here &ndash;&gt;-->
-<!--      <artifactId>junit-dep</artifactId>-->
-<!--      <version>4.8.2</version>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
 
     <dependency>
     <groupId>io.jsonwebtoken</groupId>
@@ -172,27 +111,6 @@
           </excludes>
         </configuration>
       </plugin>
-<!--      <plugin>-->
-<!--        <groupId>com.google.cloud.tools</groupId>-->
-<!--        <artifactId>jib-maven-plugin</artifactId>-->
-<!--        <version>3.2.1</version>-->
-<!--        <configuration>-->
-<!--          <from>-->
-<!--            <image>eclipse-temurin:17.0.4.1_1-jre</image>-->
-<!--          </from>-->
-<!--          <to>-->
-<!--            <image>registry.hub.docker.com/sivk23/${project.artifactId}</image>-->
-<!--          </to>-->
-<!--        </configuration>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <phase>package</phase>-->
-<!--            <goals>-->
-<!--              <goal>dockerBuild</goal>-->
-<!--            </goals>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
     </plugins>
   </build>
 

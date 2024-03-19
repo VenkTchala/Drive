@@ -26,5 +26,4 @@ public class Uploadcontroller {
                        HttpServletResponse servletResponse ) throws IOException {
         fileService.upload(servletRequest,servletResponse);
     }
-
 }

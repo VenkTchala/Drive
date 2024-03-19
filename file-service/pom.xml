@@ -7,10 +7,10 @@
         <artifactId>Drive</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>FileService</artifactId>
+    <artifactId>fileService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>FileService</name>
-    <description>FileService</description>
+    <name>fileService</name>
+    <description>fileService</description>
     <properties>
         <java.version>17</java.version>
     </properties>

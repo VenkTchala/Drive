@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface FileRepository extends JpaRepository<DriveFile,Long> {
     List<DriveFile> getDriveFilesByUser(FileUser user);
+    Boolean existsByUserAndFileName(FileUser user, String filename);
 }
