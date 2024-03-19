@@ -55,7 +55,7 @@ public class FileService {
                 .build();
         fileUserRepository.save(user);
 
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage" + username);
+        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator + username);
         Files.createParentDirs(rootPath.toFile());
     }
 
@@ -68,7 +68,7 @@ public class FileService {
 
         UploadInfo uploadInfo = null;
 
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage/" + email );
+        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator + email );
 
         try {
             uploadInfo = this.tusUploadService.getUploadInfo(uploadURI);
@@ -244,12 +244,12 @@ public class FileService {
     }
 
     public void deleteFile(DriveFile file,String email){
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage/" + email + "/" + file.getFileName());
+        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator  + email + File.separator + file.getFileName());
         rootPath.toFile().delete();
     }
 
     public ResponseEntity<Resource> downloadFile(String username, String fileName){
-        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "/Storage/" + username + "/" + fileName);
+        Path rootPath = Paths.get(ClassLoader.getSystemResource(".").getPath() + "Storage" + File.separator + username + File.separator + fileName);
 
         ByteArrayResource resource;
         try {
